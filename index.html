@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-28359909-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-28359909-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>WebXR Boilerplate | Heyvian</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600&family=Open+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link href="dist/css/main.min.css?" rel="stylesheet" type="text/css" media="screen" />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="dist/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="dist/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="dist/images/favicon-16x16.png">
+    <link rel="manifest" href="dist/images/site.webmanifest">
+    <link rel="mask-icon" href="dist/images/safari-pinned-tab.svg" color="#090909">
+    <meta name="msapplication-TileColor" content="#090909">
+    <meta name="theme-color" content="#090909">
+
+    <meta property="og:title" content="WebXR Boilerplate | Heyvian">
+    <meta property="og:site_name" content="WebXR Boilerplate | Heyvian">
+    <meta property="og:url" content="https://heyvian.com">
+    <meta property="og:description" content="WebXR Boilerplate | Heyvian">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="dist/images/share-image.png">
+</head>
+
+<body>
+    <div class="c-xr-container js-xr-container"></div>
+    <button class="c-start-xr-btn js-start-webxr">Start XR Session</button>
+    <div class="c-ar-overlay js-ar-overlay">
+        <button class="c-ar-overlay__close-btn js-close-webxr" aria-label="Close XR session"></button>
+    </div>
+    <script type="module" src="dist/js/site.js?"></script>
+</body>
+
+</html>
