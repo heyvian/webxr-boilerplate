@@ -1,6 +1,5 @@
 module.exports = function(dirs, io){
 
-    const fs = require('fs');
     const notify = require('gulp-notify');
 
     const helpers = {

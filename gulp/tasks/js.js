@@ -1,18 +1,10 @@
 module.exports = function(dirs, helpers){
 
-    // const cached = require('gulp-cached');
-    // const dependents = require('gulp-dependents');
     const del = require('del');
     const glob = require('glob');
-    const gulp = require('gulp');
-    // const mergeStream = require('merge-stream');
-    // const minify = require('gulp-minify');
-    // const notify = require('gulp-notify');
     const watch = require('gulp-watch');
-    // const notifier = require('node-notifier');
     const fancyLog = require('fancy-log');
     const colors = require('ansi-colors');
-
     const rollup = require('rollup');
     const rollupResolve = require('@rollup/plugin-node-resolve');
     const alias = require('@rollup/plugin-alias');
@@ -35,9 +27,7 @@ module.exports = function(dirs, helpers){
             const processes = [];
 
             const plugins = [
-                // initialize npm module name resolver
                 rollupResolve.nodeResolve(),
-                // initialize module aliaser
                 alias({
                     entries: dirs.moduleAliases
                 })
