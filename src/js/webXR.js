@@ -77,8 +77,6 @@ XR.init = function(XRtype) {
     this.closeXRbtn.addEventListener('click', e => {
         this.currentSession.end();
     });
-
-    this.initControllers();
 }
 
 XR.startXRSession = function() {
@@ -123,6 +121,8 @@ XR.onSessionStarted = async function(session) {
     if(XR.XRtype == 'ar') {
         document.querySelector('body').classList.add('has-ar');
     }
+
+    XR.initControllers();
 
 }
 
@@ -173,45 +173,41 @@ XR.render = function(time, frame) {
 
 XR.initControllers = function() {
 
-    if (XR.XRtype == 'vr') {
-        // controllers
+    console.log(XR.currentSession);
 
-        XR.controller1 = XR.renderer.xr.getController( 0 );
-        XR.scene.add( XR.controller1 );
+    // controllers
+    XR.controller1 = XR.renderer.xr.getController( 0 );
+    XR.controller1.addEventListener('select', onSelect);
+    XR.scene.add( XR.controller1 );
 
-        XR.controller2 = XR.renderer.xr.getController( 1 );
-        XR.scene.add( XR.controller2 );
+    XR.controller2 = XR.renderer.xr.getController( 1 );
+    XR.scene.add( XR.controller2 );
 
-        const controllerModelFactory = new XRControllerModelFactory();
-        const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+    const controllerModelFactory = new XRControllerModelFactory();
+    const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
 
-        // Hand 1
-        XR.controllerGrip1 = XR.renderer.xr.getControllerGrip( 0 );
-        XR.controllerGrip1.add( controllerModelFactory.createControllerModel( XR.controllerGrip1 ) );
-        XR.scene.add( XR.controllerGrip1 );
+    // Hand 1
+    XR.controllerGrip1 = XR.renderer.xr.getControllerGrip( 0 );
+    XR.controllerGrip1.add( controllerModelFactory.createControllerModel( XR.controllerGrip1 ) );
+    XR.scene.add( XR.controllerGrip1 );
 
-        XR.hand1 = XR.renderer.xr.getHand( 0 );
-        XR.hand1.addEventListener( 'pinchstart', onPinchStartLeft );
-        XR.hand1.addEventListener( 'pinchend', onPinchEndLeft );
-        XR.hand1.add( handModelFactory.createHandModel( XR.hand1 ) );
+    XR.hand1 = XR.renderer.xr.getHand( 0 );
+    XR.hand1.addEventListener( 'pinchstart', onPinchStartLeft );
+    XR.hand1.addEventListener( 'pinchend', onPinchEndLeft );
+    XR.hand1.add( handModelFactory.createHandModel( XR.hand1 ) );
 
-        XR.scene.add( XR.hand1 );
+    XR.scene.add( XR.hand1 );
 
-        // Hand 2
-        XR.controllerGrip2 = XR.renderer.xr.getControllerGrip( 1 );
-        XR.controllerGrip2.add( controllerModelFactory.createControllerModel( XR.controllerGrip2 ) );
-        XR.scene.add( XR.controllerGrip2 );
+    // Hand 2
+    XR.controllerGrip2 = XR.renderer.xr.getControllerGrip( 1 );
+    XR.controllerGrip2.add( controllerModelFactory.createControllerModel( XR.controllerGrip2 ) );
+    XR.scene.add( XR.controllerGrip2 );
 
-        XR.hand2 = XR.renderer.xr.getHand( 1 );
-        XR.hand2.addEventListener( 'pinchstart', onPinchStartRight );
-        XR.hand2.addEventListener( 'pinchend', onPinchEndRight );
-        XR.hand2.add( handModelFactory.createHandModel( XR.hand2 ) );
-        XR.scene.add( XR.hand2 );
-    } else if (XR.XRtype == 'ar') {
-        XR.controller = XR.renderer.xr.getController(0);
-        XR.controller.addEventListener('select', onSelect);
-        XR.scene.add(XR.controller);
-    }
+    XR.hand2 = XR.renderer.xr.getHand( 1 );
+    XR.hand2.addEventListener( 'pinchstart', onPinchStartRight );
+    XR.hand2.addEventListener( 'pinchend', onPinchEndRight );
+    XR.hand2.add( handModelFactory.createHandModel( XR.hand2 ) );
+    XR.scene.add( XR.hand2 );
 
 }
 
