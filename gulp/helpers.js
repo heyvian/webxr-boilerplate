@@ -61,7 +61,6 @@ module.exports = function(dirs, io){
             } else if(severity === 'warning'){
                 options.title = 'Warning';
                 options.sound = false;
-                options.icon = __dirname + '/gulp-warning.png';
             }
 
             notify(options).write(obj);

@@ -32,7 +32,7 @@ module.exports = function(dirs, helpers){
 
             paths.forEach(path => {
                 let process = gulp.src(path.input)
-                    // filter out any non-changed files
+                    // filter out any unchanged files
                     .pipe(cached('scss-compile'))
                     .pipe(dependents())
                     // compile
@@ -48,15 +48,8 @@ module.exports = function(dirs, helpers){
                         .on('error', sass.logError)
                     )
                     // .on('error', error => helpers.notifyError(error, 'error')) 
-                    // automatically insert vendor prefixes
-                    .pipe(
-                        autoprefixer({
-                            grid: true
-                        })
-                    )
-                    // write sourcemaps
+                    .pipe( autoprefixer() )
                     .pipe(sourcemaps.write())
-                    // write output
                     .pipe(gulp.dest(path.output))
                     // minify
                     .pipe(cleancss())
@@ -100,36 +93,6 @@ module.exports = function(dirs, helpers){
             });
             // ignore errors on merged stream (should be handled in individual stream)
             processes.on('error', error => {});
-        },
-
-        fix: function(){
-            const paths = helpers.getPaths(['scss', 'scss-lint']);
-            const processes = mergeStream();
-
-            paths.forEach(path => {
-                let process = gulp.src(path.input, { base: './' })
-                    // lint
-                    .pipe(stylelint({
-                        fix: true,
-                        reporters: [
-                            { formatter: 'string', console: false }
-                        ]
-                    }))
-                    // show warning notification
-                    .on('error', error => helpers.notifyError(error, 'error'))
-                    // write fixes to source file
-                    .pipe(gulp.dest('.'));
-
-                processes.add(process);
-            });
-            // ignore errors on merged stream (should be handled in individual stream)
-            processes.on('error', error => {});
-            // show success notification
-            processes.pipe(notify({
-                title: 'SCSS Fixed',
-                message: 'All auto-fixable lint errors have been corrected',
-                onLast: true
-            }));
         }
 
     }

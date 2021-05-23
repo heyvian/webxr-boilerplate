@@ -1,14 +1,14 @@
 module.exports = function(dirs, helpers){
 
-    const del = require('del');
-    const glob = require('glob');
-    const watch = require('gulp-watch');
-    const fancyLog = require('fancy-log');
+    const alias = require('@rollup/plugin-alias');
     const colors = require('ansi-colors');
+    const del = require('del');
+    const fancyLog = require('fancy-log');
+    const glob = require('glob');
     const rollup = require('rollup');
     const rollupResolve = require('@rollup/plugin-node-resolve');
-    const alias = require('@rollup/plugin-alias');
     const rollupTerser = require('rollup-plugin-terser');
+    const watch = require('gulp-watch');
 
     const tasks = {
 
