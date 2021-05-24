@@ -17,6 +17,7 @@ XR.init = function(XRtype) {
     this.renderer;
     this.referenceSpace;
     this.hitTestSource;
+    this.viewerPosition = new THREE.Vector3();
     this.session;
     this.currentSession = null;
     this.controller;
@@ -139,6 +140,9 @@ XR.animate = function() {
 
 XR.render = function(time, frame) {
     // console.log(renderer);
+
+    XR.camera.getWorldPosition(XR.viewerPosition);
+    
     if (XR.cube) {
         XR.cube.rotation.x += 0.01;
         XR.cube.rotation.y -= 0.01;
@@ -213,6 +217,30 @@ XR.initControllers = function() {
 
 function onSelect(e) {
     console.log('onSelect()');
+
+    if(XR.XRtype == 'ar') {
+        // Some rasting for AR
+        const dir = new THREE.Vector3( 1, 2, 0 );
+        XR.camera.getWorldDirection(dir)
+        const raycaster = new THREE.Raycaster();
+
+        // Setup racaster
+        raycaster.setFromCamera( XR.viewerPosition,  XR.camera );
+        // Update it to use the proper direction
+        raycaster.set(XR.viewerPosition, dir);
+
+        // Add an arrow helper to show the raycaster
+        XR.scene.add(new THREE.ArrowHelper( raycaster.ray.direction, raycaster.ray.origin, 100, Math.random() * 0xffffff ));
+
+        // calculate objects intersecting the picking ray
+        const intersects = raycaster.intersectObjects( XR.scene.children );
+
+        for ( let i = 0; i < intersects.length; i ++ ) {
+
+            intersects[ i ].object.material.color.set( Math.random() * 0xffffff );
+
+        }
+    }
 }
 
 function onPinchStartLeft( event ) {

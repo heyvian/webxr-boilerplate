@@ -1,7 +1,7 @@
 import { siteUI } from './ui';
 import { XR } from './webXR';
 
-const XRtype = 'vr'; // ar or vr
+const XRtype = 'ar'; // ar or vr
 
 siteUI.init(XRtype, XR);
 
