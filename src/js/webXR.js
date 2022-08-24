@@ -37,7 +37,6 @@ XR.init = function(XRtype) {
     const cubeGeo = new THREE.BoxGeometry( 0.25, 0.25, 0.25 );
     this.sampleCube = new THREE.Mesh( cubeGeo, sampleGeoMat );
     this.sampleCube.position.set(0, 1, -2);
-    this.sampleCube.castShadow = true;
     this.scene.add( this.sampleCube );
 
     const hitConeGeo = new THREE.ConeGeometry( 0.05, 0.15, 8 );
@@ -46,35 +45,11 @@ XR.init = function(XRtype) {
     hitConeGeo.translate(0, hitConeGeo.boundingBox.max.y, 0);
     this.hitCone = new THREE.Mesh( hitConeGeo, sampleGeoMat );
     this.hitCone.visible = false;
-    this.hitCone.castShadow = true;
     this.scene.add( this.hitCone );
 
     var light = new THREE.SpotLight(0xffffff, 1);
     light.position.set(2, 12, 0);
-    light.castShadow = true;
-    // light.shadow.mapSize.width = 2048;
-    // light.shadow.mapSize.height = 2048;
     this.scene.add(light);
-
-    // Make a large plane to receive our shadows
-    // const planeGeometry = new THREE.PlaneGeometry(0.05, 0.05);
-    // Rotate our plane to be parallel to the floor
-    // planeGeometry.rotateX( -Math.PI / 2);
-
-    // Create a mesh with a shadow material, resulting in a mesh
-    // that only renders shadows once we flip the `receiveShadow` property.
-    // this.shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
-    //   opacity: 0.2
-    // }));
-
-    // XR.shadowPlaneCreated = false;
-
-    // this.shadowMesh.receiveShadow = true;
-    // this.shadowMesh.visible = true;
-    // shadowMesh.position.y = 0;
-
-    // Add lights and shadow material to scene.
-    // XR.scene.add(this.shadowMesh);
 
     this.scene.add( new THREE.AmbientLight( '#fff', 0.5 ) );
 
@@ -86,8 +61,6 @@ XR.init = function(XRtype) {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(document.body.clientWidth, document.body.clientHeight);
     this.renderer.xr.enabled = true;
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.container.appendChild(this.renderer.domElement);
 
     if(this.XRtype == 'ar') {
@@ -210,22 +183,6 @@ XR.render = function(time, frame) {
                     // XR.hitCone.matrix.fromArray( hitPose.transform.matrix );
                     XR.hitCone.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z);
                     XR.hitCone.quaternion.set(hitPose.transform.orientation.x, hitPose.transform.orientation.y, hitPose.transform.orientation.z, hitPose.transform.orientation.w);
-
-                    // XR.shadowMesh.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z);
-                    // XR.shadowMesh.quaternion.set(hitPose.transform.orientation.x, hitPose.transform.orientation.y, hitPose.transform.orientation.z, hitPose.transform.orientation.w);
-                    // XR.shadowMesh.matrix.fromArray( hitPose.transform.matrix );
-                    // XR.shadowMesh.updateMatrixWorld(true);
-
-                    // if(!XR.shadowPlaneCreated) {
-                    //     XR.shadowMesh.matrix.fromArray(hitPose.transform.matrix);
-                    //     XR.shadowPlaneCreated = true;
-                    // }
-
-                    // const cloneShadow = XR.shadowMesh.clone();
-                    // cloneShadow.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z);
-                    // cloneShadow.quaternion.set(hitPose.transform.orientation.x, hitPose.transform.orientation.y, hitPose.transform.orientation.z, hitPose.transform.orientation.w);
-                    // XR.scene.add(cloneShadow);
-
                 } else {
                     XR.hitCone.visible = false;
                     XR.hitResult = false;
@@ -285,17 +242,9 @@ function onSelect(e) {
 
         if (XR.hitCone) {
             const clone = XR.hitCone.clone();
-            console.log(clone.position);
             clone.position.setFromMatrixPosition(XR.hitCone.matrix);
             clone.quaternion.setFromRotationMatrix(XR.hitCone.matrix);
             XR.scene.add(clone);
-
-            // const cloneShadow = XR.shadowMesh.clone();
-            // cloneShadow.position.setFromMatrixPosition(XR.hitCone.matrix);
-            // cloneShadow.quaternion.setFromRotationMatrix(XR.hitCone.matrix);
-            // XR.scene.add(cloneShadow);
-
-            // XR.shadowMesh.position.y = clone.position.y;
         }
 
         // Some rasting for AR
