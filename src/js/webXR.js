@@ -17,6 +17,7 @@ XR.init = function(XRtype) {
     this.renderer;
     this.referenceSpace;
     this.hitTestSource;
+    this.hitResult;
     this.viewerPosition = new THREE.Vector3();
     this.session;
     this.currentSession = null;
@@ -27,29 +28,66 @@ XR.init = function(XRtype) {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, window.innerHeight / window.innerWidth, 1, 200);
 
-    const geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
-    const material = new THREE.MeshPhongMaterial({
+    
+    const sampleGeoMat = new THREE.MeshPhongMaterial({
         color: '#41591D',
         flatShading: true,
-      });
-    this.cube = new THREE.Mesh( geometry, material );
-    this.cube.position.set(0, 1, -1);
-    this.scene.add( this.cube );
+    });
 
-    var light = new THREE.PointLight( '#fff', 1, 10, 2 );
-    light.position.set(2, 2, 0);
-    light.lookAt(this.cube.matrixWorld);
+    const cubeGeo = new THREE.BoxGeometry( 0.25, 0.25, 0.25 );
+    this.sampleCube = new THREE.Mesh( cubeGeo, sampleGeoMat );
+    this.sampleCube.position.set(0, 1, -2);
+    this.sampleCube.castShadow = true;
+    this.scene.add( this.sampleCube );
+
+    const hitConeGeo = new THREE.ConeGeometry( 0.05, 0.15, 8 );
+    hitConeGeo.rotateX(THREE.MathUtils.degToRad(180));
+    hitConeGeo.computeBoundingBox();
+    hitConeGeo.translate(0, hitConeGeo.boundingBox.max.y, 0);
+    this.hitCone = new THREE.Mesh( hitConeGeo, sampleGeoMat );
+    this.hitCone.visible = false;
+    this.hitCone.castShadow = true;
+    this.scene.add( this.hitCone );
+
+    var light = new THREE.SpotLight(0xffffff, 1);
+    light.position.set(2, 12, 0);
+    light.castShadow = true;
+    // light.shadow.mapSize.width = 2048;
+    // light.shadow.mapSize.height = 2048;
     this.scene.add(light);
 
-    this.scene.add( new THREE.AmbientLight( '#fff', 0.25 ) );
+    // Make a large plane to receive our shadows
+    // const planeGeometry = new THREE.PlaneGeometry(0.05, 0.05);
+    // Rotate our plane to be parallel to the floor
+    // planeGeometry.rotateX( -Math.PI / 2);
+
+    // Create a mesh with a shadow material, resulting in a mesh
+    // that only renders shadows once we flip the `receiveShadow` property.
+    // this.shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
+    //   opacity: 0.2
+    // }));
+
+    // XR.shadowPlaneCreated = false;
+
+    // this.shadowMesh.receiveShadow = true;
+    // this.shadowMesh.visible = true;
+    // shadowMesh.position.y = 0;
+
+    // Add lights and shadow material to scene.
+    // XR.scene.add(this.shadowMesh);
+
+    this.scene.add( new THREE.AmbientLight( '#fff', 0.5 ) );
 
     this.renderer = new THREE.WebGLRenderer({
         antialias: true,
-        alpha: true
+        alpha: true,
+        preserveDrawingBuffer: true,
     });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(document.body.clientWidth, document.body.clientHeight);
     this.renderer.xr.enabled = true;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.container.appendChild(this.renderer.domElement);
 
     if(this.XRtype == 'ar') {
@@ -143,10 +181,10 @@ XR.render = function(time, frame) {
 
     XR.camera.getWorldPosition(XR.viewerPosition);
     
-    if (XR.cube) {
-        XR.cube.rotation.x += 0.01;
-        XR.cube.rotation.y -= 0.01;
-        XR.cube.rotation.z += 0.01
+    if (XR.sampleCube) {
+        XR.sampleCube.rotation.x += 0.01;
+        XR.sampleCube.rotation.y -= 0.01;
+        XR.sampleCube.rotation.z += 0.01
     }
     if (XR.renderer.xr.isPresenting) {
         const pose = frame.getViewerPose(XR.referenceSpace);
@@ -162,10 +200,35 @@ XR.render = function(time, frame) {
 
                 const hitTestResults = frame.getHitTestResults(XR.hitTestSource);
 
-                if (hitTestResults.length > 0) {
-                    
-                } else {
+                if (hitTestResults.length) {
+                    XR.hitCone.visible = true;
+                    XR.hitResult = true;
 
+                    const hit = hitTestResults[0];
+                    const hitPose = hit.getPose(XR.referenceSpace);
+
+                    // XR.hitCone.matrix.fromArray( hitPose.transform.matrix );
+                    XR.hitCone.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z);
+                    XR.hitCone.quaternion.set(hitPose.transform.orientation.x, hitPose.transform.orientation.y, hitPose.transform.orientation.z, hitPose.transform.orientation.w);
+
+                    // XR.shadowMesh.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z);
+                    // XR.shadowMesh.quaternion.set(hitPose.transform.orientation.x, hitPose.transform.orientation.y, hitPose.transform.orientation.z, hitPose.transform.orientation.w);
+                    // XR.shadowMesh.matrix.fromArray( hitPose.transform.matrix );
+                    // XR.shadowMesh.updateMatrixWorld(true);
+
+                    // if(!XR.shadowPlaneCreated) {
+                    //     XR.shadowMesh.matrix.fromArray(hitPose.transform.matrix);
+                    //     XR.shadowPlaneCreated = true;
+                    // }
+
+                    // const cloneShadow = XR.shadowMesh.clone();
+                    // cloneShadow.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z);
+                    // cloneShadow.quaternion.set(hitPose.transform.orientation.x, hitPose.transform.orientation.y, hitPose.transform.orientation.z, hitPose.transform.orientation.w);
+                    // XR.scene.add(cloneShadow);
+
+                } else {
+                    XR.hitCone.visible = false;
+                    XR.hitResult = false;
                 }
             }
 
@@ -219,6 +282,22 @@ function onSelect(e) {
     console.log('onSelect()');
 
     if(XR.XRtype == 'ar') {
+
+        if (XR.hitCone) {
+            const clone = XR.hitCone.clone();
+            console.log(clone.position);
+            clone.position.setFromMatrixPosition(XR.hitCone.matrix);
+            clone.quaternion.setFromRotationMatrix(XR.hitCone.matrix);
+            XR.scene.add(clone);
+
+            // const cloneShadow = XR.shadowMesh.clone();
+            // cloneShadow.position.setFromMatrixPosition(XR.hitCone.matrix);
+            // cloneShadow.quaternion.setFromRotationMatrix(XR.hitCone.matrix);
+            // XR.scene.add(cloneShadow);
+
+            // XR.shadowMesh.position.y = clone.position.y;
+        }
+
         // Some rasting for AR
         const dir = new THREE.Vector3( 1, 2, 0 );
         XR.camera.getWorldDirection(dir)
@@ -236,8 +315,8 @@ function onSelect(e) {
         const intersects = raycaster.intersectObjects( XR.scene.children );
 
         for ( let i = 0; i < intersects.length; i ++ ) {
-
-            intersects[ i ].object.material.color.set( Math.random() * 0xffffff );
+            console.log(intersects[ i ]);
+            // intersects[ i ].object.material.color.set( Math.random() * 0xffffff );
 
         }
     }
