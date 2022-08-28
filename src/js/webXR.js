@@ -25,7 +25,6 @@ XR.init = function(XRtype) {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, window.innerHeight / window.innerWidth, 1, 200);
 
-    
     const sampleGeoMat = new THREE.MeshPhongMaterial({
         color: '#41591D',
         flatShading: true,
