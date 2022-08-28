@@ -11,9 +11,7 @@ XR.init = function(XRtype) {
     this.XRtype = XRtype;
     this.container = document.querySelector('.js-xr-container');
     this.camera;
-    this.gl;
     this.scene;
-    this.controls;
     this.renderer;
     this.referenceSpace;
     this.hitTestSource;
@@ -21,7 +19,6 @@ XR.init = function(XRtype) {
     this.viewerPosition = new THREE.Vector3();
     this.session;
     this.currentSession = null;
-    this.controller;
     this.overlay = document.querySelector('.js-ar-overlay');
     this.closeXRbtn = document.querySelector('.js-close-webxr');
 
